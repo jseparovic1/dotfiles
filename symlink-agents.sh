@@ -1,11 +1,10 @@
 #!/bin/bash
 #
-# Symlink the canonical agent files into every AI coding harness on this
-# machine. Each harness reads a differently-named file, but they all point at
-# the same source of truth so instructions stay in sync:
+# Symlink the canonical AGENTS.md into every AI coding harness on this machine.
+# Each harness reads a differently-named file, but they all point at the same
+# source of truth so instructions stay in sync:
 #
-#   agents/AGENTS.md   -> ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/AGENTS.md, ...
-#   agents/OPINIONS.md -> ~/OPINIONS.md   (read on demand, referenced by AGENTS.md)
+#   agents/AGENTS.md -> ~/.claude/CLAUDE.md, ~/.codex/AGENTS.md, ~/AGENTS.md, ...
 #
 # Safe to re-run: existing regular files are backed up to <file>.bak, and stale
 # symlinks are replaced.
@@ -13,10 +12,7 @@
 set -euo pipefail
 
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-AGENTS_SRC_DIR="$DOTFILES_DIR/agents"
-
-AGENTS_SRC="$AGENTS_SRC_DIR/AGENTS.md"
-OPINIONS_SRC="$AGENTS_SRC_DIR/OPINIONS.md"
+AGENTS_SRC="$DOTFILES_DIR/agents/AGENTS.md"
 
 # Where AGENTS.md gets linked - the primary instruction file each harness reads.
 # Add new harnesses here.
@@ -47,17 +43,13 @@ link() {
 	echo "linked  $target -> $source"
 }
 
-echo 'Symlink agent files into harnesses'
-echo '----------------------------------'
+echo 'Symlink AGENTS.md into harnesses'
+echo '--------------------------------'
 
-for src in "$AGENTS_SRC" "$OPINIONS_SRC"; do
-	[[ -f "$src" ]] || { echo "error: $src not found" >&2; exit 1; }
-done
+[[ -f "$AGENTS_SRC" ]] || { echo "error: $AGENTS_SRC not found" >&2; exit 1; }
 
 for target in "${AGENTS_TARGETS[@]}"; do
 	link "$AGENTS_SRC" "$target"
 done
-
-link "$OPINIONS_SRC" "$HOME/OPINIONS.md"
 
 echo 'Done!'
