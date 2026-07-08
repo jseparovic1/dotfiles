@@ -2,18 +2,15 @@
 #
 # bootstrap installs things.
 
-function bootstrapTerminal() {
-	sudo -v #ask password beforehand
-	source ./install
-}
+set -euo pipefail
 
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 echo 'Bootstrap terminal'
 echo '------------------'
-echo 'This will reset your terminal. Are you sure you want to to this? (y/n) '
-read -p 'Answer: '  reply
+read -p 'This will set up your terminal and symlink dotfiles. Continue? (y/n) ' reply
 
-if [[ $reply =~ ^[Yy]$ ]]
-then
-   bootstrapTerminal
+if [[ $reply =~ ^[Yy]$ ]]; then
+	sudo -v # ask for password upfront
+	bash "$DOTFILES_DIR/install.sh"
 fi

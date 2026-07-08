@@ -1,54 +1,58 @@
-# Path to your dotfiles.
-export DOTFILES=$HOME/.dotfiles
-
+# Path to your dotfiles (~/.dotfiles is symlinked to this repo by install.sh).
+export DOTFILES="$HOME/.dotfiles"
 export ZSH="$HOME/.oh-my-zsh"
-source $ZSH/oh-my-zsh.sh
+export ZSH_CUSTOM="$DOTFILES/shell/custom"
 
-# ZSH SETTINGS
-ZSH_THEME="refined"
+# Homebrew (Apple Silicon). Puts brew on PATH before anything else needs it.
+if [ -x /opt/homebrew/bin/brew ]; then
+	eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# oh-my-zsh
+ZSH_THEME=""                       # prompt is handled by starship below
 COMPLETION_WAITING_DOTS="true"
+plugins=(git)                      # must be set before sourcing oh-my-zsh
+source "$ZSH/oh-my-zsh.sh"
 
-# Plugins
-# Standard plugins can be found in ~/.oh-my-zsh/plugins/*
-# Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
-plugins=(
-  git
-)
+# zsh-autosuggestions (installed via brew)
+if [ -n "$HOMEBREW_PREFIX" ] && [ -f "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh" ]; then
+	source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
+fi
 
 # Load the shell dotfiles, and then some:
-for file in ~/.dotfiles/shell/.{exports,aliases,functions}; do
-	[ -r "$file" ] && [ -f "$file" ] && source "$file"
-done
-
-for file in ~/.dotfiles-custom/shell/.{exports,aliases,functions,zshrc}; do
+for file in "$DOTFILES"/shell/.{exports,aliases,functions}; do
 	[ -r "$file" ] && [ -f "$file" ] && source "$file"
 done
 unset file
 
-if [ -f ~/.aliases ]; then
-    . ~/.aliases
+# Starship prompt
+if command -v starship >/dev/null 2>&1; then
+	export STARSHIP_CONFIG="$DOTFILES/shell/starship.toml"
+	eval "$(starship init zsh)"
 fi
 
-
-# SPACESHIP
-autoload -U promptinit; promptinit
-prompt spaceship
-
-SPACESHIP_PROMPT_ADD_NEWLINE=false
-SPACESHIP_PROMPT_ORDER=(
-  dir           # Current directory section
-  user          # Username section
-  git           # Git section (git_branch + git_status)
-  jobs          # Background jobs indicator
-  char          # Prompt character
-)
-
-# PATHS
-export PATH="$HOME/.symfony/bin:$PATH"
+# Composer global bin
 export PATH="$HOME/.composer/vendor/bin:$PATH"
-export PATH="/usr/local/opt/icu4c/bin:$PATH"
-export PATH="/usr/local/opt/icu4c/sbin:$PATH"
-export PATH="/usr/local/opt/php@7.1/bin:$PATH"
-export PATH="/usr/local/opt/php@7.1/sbin:$PATH"
-export PATH="/usr/local/opt/mysql@5.7/bin:$PATH"
-export PATH="$PATH:~/.composer/vendor/bin"
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
+# The next line enables shell command completion for gcloud.
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
+
+# Herd injected PHP binary + config
+export PATH="$HOME/Library/Application Support/Herd/bin/":$PATH
+export HERD_PHP_84_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/84/"
+export HERD_PHP_83_INI_SCAN_DIR="$HOME/Library/Application Support/Herd/config/php/83/"
+
+# nvm
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# ~/.local/bin (Droid, Antigravity CLI, etc.)
+export PATH="$HOME/.local/bin:$PATH"

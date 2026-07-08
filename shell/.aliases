@@ -25,19 +25,6 @@ alias gm="git merge"
 alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
 alias motaj="git reset --hard; git clean -df;"
 
-## Make PR
-gpr() {
-  if [ $? -eq 0 ]; then
-    github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#http://#' -e 's@com:@com/@' -e 's%\.git$%%'`;
-    branch_name=`git symbolic-ref HEAD 2>/dev/null | cut -d"/" -f 3`;
-    pr_url=$github_url"/compare/master..."$branch_name
-    open $pr_url;
-  else
-    echo 'failed to open a pull request.';
-  fi
-}
-
-
 # PHP && STUFF
 alias phpstorm='open -a /Applications/PhpStorm.app "`pwd`"'
 alias pu="vendor/bin/phpunit"
@@ -55,8 +42,12 @@ alias ci="composer install"
 alias cda="composer dump-autoload -o"
 
 #Docker
+alias dc='docker compose '
+alias dce='docker compose exec '
+alias dcr='docker compose run --rm '
 alias dockerstop='docker-compose stop'
 alias dockerrestart='docker-compose restart'
 alias dockerup='docker-compose up -d'
 alias dockerrm='docker-compose rm --all'
 alias dockerbash="docker-compose exec php bash"
+alias dive="docker run -ti --rm  -v /var/run/docker.sock:/var/run/docker.sock wagoodman/dive"

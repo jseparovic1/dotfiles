@@ -1,60 +1,74 @@
 #!/bin/bash
+#
+# Installs and symlinks everything. Idempotent - safe to re-run.
+# Assumes macOS on Apple Silicon (Homebrew at /opt/homebrew).
+
+set -euo pipefail
+
+DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+# link SRC TARGET - back up an existing real file, then symlink.
+link() {
+	local src="$1" target="$2"
+	if [[ -e "$target" && ! -L "$target" ]]; then
+		mv "$target" "$target.bak"
+		echo "backup  $target -> $target.bak"
+	fi
+	ln -sf "$src" "$target"
+	echo "linked  $target -> $src"
+}
 
 # Hide "last login" line when starting a new terminal session
-touch $HOME/.hushlogin
+touch "$HOME/.hushlogin"
 
-# Install zsh
+echo 'Install Homebrew'
+echo '----------------'
+if ! command -v brew >/dev/null 2>&1; then
+	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
 echo 'Install oh-my-zsh'
 echo '-----------------'
-rm -rf $HOME/.oh-my-zsh
-curl -L https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh | sh
+if [ ! -d "$HOME/.oh-my-zsh" ]; then
+	RUNZSH=no CHSH=no \
+		sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+fi
 
-# Add global gitignore
-ln -s ./shell/.global-gitignore $HOME/.global-gitignore
-git config --global core.excludesfile $HOME/.global-gitignore
-
-# Symlink zsh prefs
-rm $HOME/.zshrc
-ln -s ./dotfiles/shell/.zshrc $HOME/.zshrc
-
-echo 'Install composer'
+echo 'Install packages'
 echo '----------------'
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php -r "if (hash_file('sha384', 'composer-setup.php') === 'a5c698ffe4b8e849a443b120cd5ba38043260d5c4023dbf93e1558871f1f07f58274fc6f4c93bcfd858c6bd0775cd8d1') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
-mv composer.phar /usr/local/bin/composer
+brew install \
+	pkg-config \
+	wget \
+	starship \
+	zsh-autosuggestions \
+	composer \
+	node@22
 
-echo 'Install homebrew'
-echo '----------------'
-echo install homebrew
-sudo rm -rf /usr/local/Cellar /usr/local/.git && brew cleanup
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+echo 'Symlink dotfiles into ~/.dotfiles'
+echo '---------------------------------'
+link "$DOTFILES_DIR" "$HOME/.dotfiles"
 
-echo 'Install pkg-config'
+echo 'Symlink shell config'
+echo '--------------------'
+link "$DOTFILES_DIR/shell/.zshrc" "$HOME/.zshrc"
+link "$DOTFILES_DIR/shell/.aliases" "$HOME/.aliases"
+link "$DOTFILES_DIR/shell/.global-gitignore" "$HOME/.global-gitignore"
+git config --global core.excludesfile "$HOME/.global-gitignore"
+
+echo 'Symlink ssh config'
 echo '------------------'
-brew install pkg-config
+mkdir -p "$HOME/.ssh"
+link "$DOTFILES_DIR/.ssh/config" "$HOME/.ssh/config"
 
-echo 'Install wget'
-echo '------------'
-brew install wget --overwrite
-
-echo 'Install brew-cask'
-echo '-----------------'
-brew tap caskroom/cask
-brew install brew-cask
-
-echo 'Install node'
-echo '-----------'
-brew install node@20
-
-echo 'Install zsh-autosuggestions'
-echo '---------------------------'
-brew install zsh-autosuggestions
+echo 'Install phpstorm launcher'
+echo '-------------------------'
+mkdir -p "$HOME/.local/bin"
+install -m 0755 "$DOTFILES_DIR/shell/phpstorm" "$HOME/.local/bin/phpstorm"
 
 echo 'Symlink agent files into AI harnesses'
 echo '-------------------------------------'
-source "$(dirname "${BASH_SOURCE[0]}")/symlink-agents.sh"
+source "$DOTFILES_DIR/symlink-agents.sh"
 
 echo '++++++++++++++++++++++++++++++'
-echo 'All done!'
+echo 'All done! Restart your shell or run: source ~/.zshrc'

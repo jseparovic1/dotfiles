@@ -1,0 +1,56 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Inserts a blank line between shell prompts
+add_newline = false
+
+# Which is equivalent to
+format = """
+$username\
+$hostname\
+$localip\
+$shlvl\
+$singularity\
+$directory\
+$vcsh\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$guix_shell\
+$terraform\
+$memory_usage\
+$openstack\
+$env_var\
+$custom\
+$sudo\
+$cmd_duration\
+$line_break\
+$battery\
+$time\
+$status\
+$os\
+$container\
+$shell\
+$character"""
+
+# See docs https://starship.rs/config/#prompt
+
+[character]
+success_symbol = "[>](bold green)"
+error_symbol = "[x](bold red)"
+vimcmd_symbol = "[<](bold green)"
+
+[git_branch]
+format = '[$symbol$branch(:$remote_branch)]($style)'
+
+[git_commit]
+tag_symbol = " tag "
+
+[git_status]
+ahead = ">"
+behind = "<"
+diverged = "<>"
+renamed = "r"
+deleted = "x"
