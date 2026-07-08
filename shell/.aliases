@@ -1,0 +1,62 @@
+alias zshconfig="open ~/.zshrc"
+alias copykey='command cat ~/.ssh/pub | pbcopy'
+alias hostfile="sudo nano /etc/hosts"
+alias update="source ~/.zshrc"
+alias projects="cd ~/Projects";
+
+# IP addresses
+alias ip="dig +short myip.opendns.com @resolver1.opendns.com"
+alias localip="ifconfig -a | grep -o 'inet6\? \(addr:\)\?\s\?\(\(\([0-9]\+\.\)\{3\}[0-9]\+\)\|[a-fA-F0-9:]\+\)' | awk '{ sub(/inet6? (addr:)? ?/, \"\"); print }'"
+
+# Lock the screen
+alias afk="/System/Library/CoreServices/Menu\ Extras/User.menu/Contents/Resources/CGSession -suspend"
+
+# Empty the Trash on all mounted volumes and the main HDD
+# Also, clear Apple’s System Logs to improve shell startup speed
+alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl"
+
+# Enable aliases to be sudo’ed
+alias sudo='sudo '
+
+# Git
+alias gc="git checkout"
+alias gpo="git push origin"
+alias gm="git merge"
+alias glog="git log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit"
+alias motaj="git reset --hard; git clean -df;"
+
+## Make PR
+gpr() {
+  if [ $? -eq 0 ]; then
+    github_url=`git remote -v | awk '/fetch/{print $2}' | sed -Ee 's#(git@|git://)#http://#' -e 's@com:@com/@' -e 's%\.git$%%'`;
+    branch_name=`git symbolic-ref HEAD 2>/dev/null | cut -d"/" -f 3`;
+    pr_url=$github_url"/compare/master..."$branch_name
+    open $pr_url;
+  else
+    echo 'failed to open a pull request.';
+  fi
+}
+
+
+# PHP && STUFF
+alias phpstorm='open -a /Applications/PhpStorm.app "`pwd`"'
+alias pu="vendor/bin/phpunit"
+alias puf="phpunit --filter "
+alias deleteDS="find . -name '.DS_Store' -type f -delete"
+
+#Laravel
+alias a="php artisan"
+alias mfs='php artisan migrate:fresh --seed'
+
+# Composer
+alias cup="composer update"
+alias creq="composer require"
+alias ci="composer install"
+alias cda="composer dump-autoload -o"
+
+#Docker
+alias dockerstop='docker-compose stop'
+alias dockerrestart='docker-compose restart'
+alias dockerup='docker-compose up -d'
+alias dockerrm='docker-compose rm --all'
+alias dockerbash="docker-compose exec php bash"
