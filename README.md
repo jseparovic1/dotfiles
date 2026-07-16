@@ -10,11 +10,13 @@ Built for Apple Silicon with Homebrew at `/opt/homebrew`.
 ├── agents/
 │   └── AGENTS.md        # global AI agent instructions (Claude, Codex, ...)
 ├── shell/
-│   ├── .zshrc           # zsh + oh-my-zsh + starship setup
-│   ├── .aliases         # git, docker, composer, laravel shortcuts
+│   ├── .zshrc                 # zsh + oh-my-zsh + starship setup
+│   ├── .aliases               # git, docker, composer, laravel shortcuts
 │   ├── .global-gitignore
-│   ├── starship.toml    # prompt config
-│   ├── phpstorm         # `phpstorm .` launcher
+│   ├── .tmux.conf             # tmux mouse, copy-mode, status bar
+│   ├── statusline-command.sh  # Claude Code statusline
+│   ├── starship.toml          # prompt config
+│   ├── phpstorm               # `phpstorm .` launcher
 │   └── Snazzy.itermcolors
 ├── macos/
 │   └── defaults.sh      # opinionated macOS system defaults
@@ -42,7 +44,8 @@ cd ~/Projects/dotfiles
 - Installs Homebrew (if missing) and oh-my-zsh.
 - Installs packages via Homebrew: `pkg-config`, `wget`, `starship`, `zsh-autosuggestions`, `composer`, `node@22`.
 - Symlinks the repo to `~/.dotfiles` so `.zshrc` can reference `$DOTFILES` from a stable path.
-- Symlinks `~/.zshrc`, `~/.aliases`, `~/.global-gitignore`, and `~/.ssh/config`.
+- Symlinks `~/.zshrc`, `~/.aliases`, `~/.global-gitignore`, `~/.tmux.conf`, and `~/.ssh/config`.
+- Symlinks `~/.claude/statusline-command.sh` (Claude Code statusline).
 - Installs the `phpstorm` launcher into `~/.local/bin`.
 - Runs `symlink-agents.sh` to wire up the AI agent instructions.
 

@@ -54,7 +54,13 @@ echo '--------------------'
 link "$DOTFILES_DIR/shell/.zshrc" "$HOME/.zshrc"
 link "$DOTFILES_DIR/shell/.aliases" "$HOME/.aliases"
 link "$DOTFILES_DIR/shell/.global-gitignore" "$HOME/.global-gitignore"
+link "$DOTFILES_DIR/shell/.tmux.conf" "$HOME/.tmux.conf"
 git config --global core.excludesfile "$HOME/.global-gitignore"
+
+echo 'Symlink Claude Code statusline'
+echo '------------------------------'
+mkdir -p "$HOME/.claude"
+link "$DOTFILES_DIR/shell/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 
 echo 'Symlink ssh config'
 echo '------------------'
