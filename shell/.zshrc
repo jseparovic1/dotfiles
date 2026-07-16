@@ -3,9 +3,12 @@ export DOTFILES="$HOME/.dotfiles"
 export ZSH="$HOME/.oh-my-zsh"
 export ZSH_CUSTOM="$DOTFILES/shell/custom"
 
-# Homebrew (Apple Silicon). Puts brew on PATH before anything else needs it.
+# Homebrew. Prefer Apple Silicon's /opt/homebrew, fall back to Intel's /usr/local.
+# Puts brew on PATH before anything else needs it.
 if [ -x /opt/homebrew/bin/brew ]; then
 	eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [ -x /usr/local/bin/brew ]; then
+	eval "$(/usr/local/bin/brew shellenv)"
 fi
 
 # oh-my-zsh

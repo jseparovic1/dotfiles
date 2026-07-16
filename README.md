@@ -1,5 +1,16 @@
 # dotfiles
 
+```
+     _       _    __ _ _
+  __| | ___ | |_ / _(_) | ___  ___
+ / _` |/ _ \| __| |_| | |/ _ \/ __|
+| (_| | (_) | |_|  _| | |  __/\__ \
+ \__,_|\___/ \__|_| |_|_|\___||___/
+
+      " Master your tools, you must. "
+        macOS · Apple Silicon · zsh
+```
+
 My personal macOS dotfiles: shell config, aliases, macOS defaults, and shared AI agent instructions.
 Built for Apple Silicon with Homebrew at `/opt/homebrew`.
 
