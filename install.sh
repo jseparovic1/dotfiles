@@ -1,7 +1,8 @@
 #!/bin/bash
 #
 # Installs and symlinks everything. Idempotent - safe to re-run.
-# Assumes macOS on Apple Silicon (Homebrew at /opt/homebrew).
+# Built for macOS on Apple Silicon (Homebrew at /opt/homebrew), but the brew
+# prefix is detected so it also works on Intel (/usr/local).
 
 set -euo pipefail
 
@@ -26,7 +27,11 @@ echo '----------------'
 if ! command -v brew >/dev/null 2>&1; then
 	/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
-eval "$(/opt/homebrew/bin/brew shellenv)"
+# Prefer Apple Silicon's /opt/homebrew, fall back to Intel's /usr/local, then PATH.
+for brew_bin in /opt/homebrew/bin/brew /usr/local/bin/brew "$(command -v brew)"; do
+	[ -x "$brew_bin" ] && break
+done
+eval "$("$brew_bin" shellenv)"
 
 echo 'Install oh-my-zsh'
 echo '-----------------'
@@ -54,7 +59,13 @@ echo '--------------------'
 link "$DOTFILES_DIR/shell/.zshrc" "$HOME/.zshrc"
 link "$DOTFILES_DIR/shell/.aliases" "$HOME/.aliases"
 link "$DOTFILES_DIR/shell/.global-gitignore" "$HOME/.global-gitignore"
+link "$DOTFILES_DIR/shell/.tmux.conf" "$HOME/.tmux.conf"
 git config --global core.excludesfile "$HOME/.global-gitignore"
+
+echo 'Symlink Claude Code statusline'
+echo '------------------------------'
+mkdir -p "$HOME/.claude"
+link "$DOTFILES_DIR/shell/statusline-command.sh" "$HOME/.claude/statusline-command.sh"
 
 echo 'Symlink ssh config'
 echo '------------------'
